@@ -1,14 +1,14 @@
 import data from "./data";
 import Keypad from "./components/Keypad";
 import { useSelector, useDispatch } from "react-redux";
-import { evaluate } from "mathjs";
+import Footer from "./Footer";
 import {
   handleCalculate,
   handleClear,
 } from "./features/calculator/calculatorSlice";
 function App() {
   const dispatch = useDispatch();
-  const { calcExpression, calcResult } = useSelector(
+  const { calcExpression, calcResult, placeholder } = useSelector(
     (state) => state.calculator
   );
   return (
@@ -16,7 +16,7 @@ function App() {
       <div className="calculator">
         <div className="calculator__screen" id="screen">
           <p className="input" id="display">
-            {calcExpression ? calcExpression : "0"}
+            {calcExpression ? calcExpression : placeholder}
           </p>
           <p className="result">{calcResult ? calcResult : "0"}</p>
         </div>
@@ -42,6 +42,7 @@ function App() {
           </button>
         </div>
       </div>
+      <Footer />
     </>
   );
 }

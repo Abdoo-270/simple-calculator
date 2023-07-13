@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { evaluate } from "mathjs";
 
 const initialState = {
-  result: 0,
+  placeholder: "0",
   calcExpression: "",
   calcResult: "",
 };
@@ -12,12 +12,36 @@ const calculatorSlice = createSlice({
   reducers: {
     handleInput: (state, action) => {
       const keypad = action.payload;
-      if (keypad != "Clear" && keypad != "=") {
-        state.calcExpression = state.calcExpression + keypad;
+      // Validate number input
+      if (keypad.match(/^\d+$/)) {
+        const expression = state.calcExpression + keypad;
+        if (!expression.startsWith("0")) {
+          state.calcExpression = expression;
+        }
+      } else if (
+        keypad === "+" ||
+        keypad === "-" ||
+        keypad === "*" ||
+        keypad === "/"
+      ) {
+        // Handle operator input
+        state.calcExpression += keypad;
+      } else if (keypad === ".") {
+        // Handle decimal point input
+        const lastNumber = state.calcExpression.split(/[+\-*/]/).pop();
+        if (!lastNumber.includes(".")) {
+          state.calcExpression += keypad;
+        }
       }
     },
     handleCalculate: (state) => {
       try {
+        if (state.calcExpression.includes("*-+")) {
+          state.calcExpression = state.calcExpression.replace(/\*-+/g, "+");
+        }
+        if (state.calcExpression.includes("*-")) {
+          state.calcExpression = state.calcExpression.replace(/\*-/g, "*-");
+        }
         state.calcResult = evaluate(state.calcExpression);
         console.log(state.calcResult);
         state.calcExpression = state.calcResult;
@@ -26,8 +50,8 @@ const calculatorSlice = createSlice({
       }
     },
     handleClear: (state) => {
-      state.calcExpression = 0;
-      state.calcResult = 0;
+      state.calcExpression = "";
+      state.calcResult = "";
     },
   },
 });
